@@ -1,0 +1,31 @@
+local P=game:GetService'Players'local U=game:GetService'UserInputService'local pl=P.LocalPlayer wait(1.5)local sp={}local sc=0 local cg=game:GetService'CoreGui'
+local tg=Instance.new'ScreenGui'tg.ResetOnSpawn=false tg.IgnoreGuiInset=true tg.DisplayOrder=10000000 tg.Parent=cg
+local tb=Instance.new'TextButton'tb.Size=UDim2.new(0,35,0,35)tb.Position=UDim2.new(0,15,0,15)tb.BackgroundColor3=Color3.fromRGB(0,150,255)tb.Text='📍'tb.TextScaled=true tb.Font=Enum.Font.GothamBold tb.TextColor3=Color3.new(1,1,1)tb.Parent=tg Instance.new('UICorner',tb).CornerRadius=UDim.new(1,0)
+local mg=Instance.new'ScreenGui'mg.ResetOnSpawn=false mg.IgnoreGuiInset=true mg.DisplayOrder=999999 mg.Parent=cg
+local mf=Instance.new'Frame'mf.Size=UDim2.new(0,200,0,200)mf.Position=UDim2.new(0,30,0.25,0)mf.BackgroundColor3=Color3.fromRGB(20,20,20)mf.BorderSizePixel=0 mf.Parent=mg Instance.new('UICorner',mf).CornerRadius=UDim.new(0,12)
+local tbar=Instance.new'Frame'tbar.Size=UDim2.new(1,0,0,40)tbar.BackgroundColor3=Color3.fromRGB(35,35,35)tbar.Parent=mf
+local tl=Instance.new'TextLabel'tl.Size=UDim2.new(1,0,1,0)tl.BackgroundTransparency=1 tl.Text='📍 テレポート'tl.TextColor3=Color3.new(1,1,1)tl.TextScaled=true tl.Font=Enum.Font.GothamBold tl.Parent=tbar
+local sf=Instance.new'ScrollingFrame'sf.Size=UDim2.new(1,-16,1,-115)sf.Position=UDim2.new(0,8,0,45)sf.BackgroundTransparency=1 sf.ScrollBarThickness=4 sf.Parent=mf Instance.new('UIListLayout',sf).Padding=UDim.new(0,8)
+local fsb=Instance.new'TextButton'fsb.Size=UDim2.new(1,-16,0,38)fsb.Position=UDim2.new(0,8,1,-78)fsb.BackgroundColor3=Color3.fromRGB(0,170,255)fsb.Text='現在地固定'fsb.TextColor3=Color3.new(1,1,1)fsb.TextScaled=true fsb.Font=Enum.Font.GothamSemibold fsb.Parent=mf
+local fpb=Instance.new'TextButton'fpb.Size=UDim2.new(1,-16,0,38)fpb.Position=UDim2.new(0,8,1,-35)fpb.BackgroundColor3=Color3.fromRGB(0,200,120)fpb.Text='プレイヤー固定'fpb.TextColor3=Color3.new(1,1,1)fpb.TextScaled=true fpb.Font=Enum.Font.GothamSemibold fpb.Parent=mf
+local dm,ds,spos=false tbar.InputBegan:Connect(function(i)if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then dm=true ds=i.Position spos=mf.Position end end)
+U.InputChanged:Connect(function(i)if dm and (i.UserInputType==Enum.UserInputType.MouseMovement or i.UserInputType==Enum.UserInputType.Touch)then local d=i.Position-ds mf.Position=UDim2.new(spos.X.Scale,spos.X.Offset+d.X,spos.Y.Scale,spos.Y.Offset+d.Y)end end)
+tbar.InputEnded:Connect(function(i)if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then dm=false end end)
+local dt,dst,stpos=false tb.InputBegan:Connect(function(i)if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then dt=true dst=i.Position stpos=tb.Position end end)
+U.InputChanged:Connect(function(i)if dt and (i.UserInputType==Enum.UserInputType.MouseMovement or i.UserInputType==Enum.UserInputType.Touch)then local d=i.Position-dst tb.Position=UDim2.new(stpos.X.Scale,stpos.X.Offset+d.X,stpos.Y.Scale,stpos.Y.Offset+d.Y)end end)
+tb.InputEnded:Connect(function(i)if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then dt=false end end)
+local v=true tb.MouseButton1Click:Connect(function()v=not v mf.Visible=v tb.Text=v and '📍' or '🔼'end)
+local function ctb(n)local it=Instance.new'Frame'it.Size=UDim2.new(1,0,0,48)it.BackgroundTransparency=1 it.Parent=sf local tpb=Instance.new'TextButton'tpb.Size=UDim2.new(0.65,0,1,0)tpb.BackgroundColor3=Color3.fromRGB(45,45,45)tpb.Text='→ '..n tpb.TextColor3=Color3.new(1,1,1)tpb.TextXAlignment=Enum.TextXAlignment.Left tpb.TextScaled=true tpb.Font=Enum.Font.Gotham tpb.Parent=it
+local eb=Instance.new'TextButton'eb.Size=UDim2.new(0.17,0,1,0)eb.Position=UDim2.new(0.65,0,0,0)eb.BackgroundColor3=Color3.fromRGB(255,160,0)eb.Text='✏️'eb.TextScaled=true eb.Font=Enum.Font.GothamBold eb.TextColor3=Color3.new(1,1,1)eb.Parent=it
+local db=Instance.new'TextButton'db.Size=UDim2.new(0.17,0,1,0)db.Position=UDim2.new(0.82,0,0,0)db.BackgroundColor3=Color3.fromRGB(200,50,50)db.Text='🗑'db.TextScaled=true db.Font=Enum.Font.GothamBold db.TextColor3=Color3.new(1,1,1)db.Parent=it
+tpb.MouseButton1Click:Connect(function()local c=pl.Character if c and c:FindFirstChild'HumanoidRootPart'then c.HumanoidRootPart.CFrame=sp[n]end end)
+eb.MouseButton1Click:Connect(function()local c=pl.Character if c and c:FindFirstChild'HumanoidRootPart'then sp[n]=c.HumanoidRootPart.CFrame end end)
+db.MouseButton1Click:Connect(function()it:Destroy()sp[n]=nil end)end
+fsb.MouseButton1Click:Connect(function()local h=pl.Character and pl.Character:FindFirstChild'HumanoidRootPart'if h then sc=sc+1 local n='固定位置 '..sc sp[n]=h.CFrame ctb(n)end end)
+fpb.MouseButton1Click:Connect(function()local pll=P:GetPlayers()if #pll<=1 then return end local sg=Instance.new'ScreenGui'sg.ResetOnSpawn=false sg.DisplayOrder=1000000 sg.Parent=cg
+local sff=Instance.new'Frame'sff.Size=UDim2.new(0,150,0,150)sff.Position=UDim2.new(0.5,-75,0.5,-75)sff.BackgroundColor3=Color3.fromRGB(25,25,25)sff.Parent=sg Instance.new('UICorner',sff).CornerRadius=UDim.new(0,10)
+local st=Instance.new'TextLabel'st.Size=UDim2.new(1,0,0,30)st.BackgroundColor3=Color3.fromRGB(40,40,40)st.Text='プレイヤー選択'st.TextColor3=Color3.new(1,1,1)st.TextScaled=true st.Font=Enum.Font.GothamBold st.Parent=sff
+local ss=Instance.new'ScrollingFrame'ss.Size=UDim2.new(1,-12,1,-68)ss.Position=UDim2.new(0,6,0,35)ss.BackgroundTransparency=1 ss.Parent=sff Instance.new('UIListLayout',ss).Padding=UDim.new(0,5)
+for _,o in ipairs(pll)do if o~=pl then local b=Instance.new'TextButton'b.Size=UDim2.new(1,0,0,30)b.BackgroundColor3=Color3.fromRGB(50,50,50)b.Text=o.Name b.TextColor3=Color3.new(1,1,1)b.TextScaled=true b.Parent=ss b.MouseButton1Click:Connect(function()local c=o.Character if c and c:FindFirstChild'HumanoidRootPart'then sc=sc+1 local n=o.Name..' '..sc sp[n]=c.HumanoidRootPart.CFrame ctb(n)end sg:Destroy()end)end end
+local cb=Instance.new'TextButton'cb.Size=UDim2.new(1,-12,0,28)cb.Position=UDim2.new(0,6,1,-35)cb.BackgroundColor3=Color3.fromRGB(180,50,50)cb.Text='閉じる'cb.TextColor3=Color3.new(1,1,1)cb.Parent=sff cb.MouseButton1Click:Connect(function()sg:Destroy()end)end)
+print'🎉 起動しました！'
