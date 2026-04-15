@@ -3,7 +3,7 @@
 -- キーシステム付きバージョン（キー認証後にのみメニュー表示）
 -- =============================================
 
-local CORRECT_KEY = "にゃんチーは神様"   -- ← ここを好きなキーに変更（例: "cuiiki123"）
+local CORRECT_KEY = "にゃんチー"   -- ← ここを好きなキーに変更（例: "cuiiki123"）
 local DISCORD_LINK = "https://discord.gg/H2tMfnYz49"
 local SCRIPT_TITLE = "クリームブリュレさんのTPメニュー"
 
