@@ -1,0 +1,249 @@
+-- Delta Executor iOS対応 小型テレポートメニュー（保存削除機能付き）
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "TeleportMenu"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = game:GetService("CoreGui")
+
+-- ==================== メインUI ====================
+local Main = Instance.new("Frame")
+Main.Size = UDim2.new(0, 210, 0, 200)
+Main.Position = UDim2.new(0.5, -105, 0.5, -100)
+Main.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+Main.BorderSizePixel = 0
+Main.Active = true
+Main.Draggable = true
+Main.Visible = true
+Main.Parent = ScreenGui
+
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 12)
+UICorner.Parent = Main
+
+-- 上部ドラッグバー
+local TitleBar = Instance.new("Frame")
+TitleBar.Size = UDim2.new(1, 0, 0, 35)
+TitleBar.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+TitleBar.BorderSizePixel = 0
+TitleBar.Parent = Main
+
+local TitleCorner = Instance.new("UICorner")
+TitleCorner.CornerRadius = UDim.new(0, 12)
+TitleCorner.Parent = TitleBar
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, -80, 1, 0)
+Title.BackgroundTransparency = 1
+Title.Text = "📍 TP Menu"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextSize = 15
+Title.Font = Enum.Font.GothamBold
+Title.Parent = TitleBar
+
+-- 閉じるボタン
+local CloseBtn = Instance.new("TextButton")
+CloseBtn.Size = UDim2.new(0, 30, 0, 30)
+CloseBtn.Position = UDim2.new(1, -35, 0, 3)
+CloseBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+CloseBtn.Text = "✕"
+CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseBtn.TextSize = 16
+CloseBtn.Font = Enum.Font.GothamBold
+CloseBtn.Parent = TitleBar
+
+CloseBtn.MouseButton1Click:Connect(function()
+    Main.Visible = false
+end)
+
+-- ==================== 25×25 ドラッグ可能表示ボタン ====================
+local ToggleButton = Instance.new("TextButton")
+ToggleButton.Size = UDim2.new(0, 25, 0, 25)
+ToggleButton.Position = UDim2.new(0, 30, 0, 30)
+ToggleButton.BackgroundColor3 = Color3.fromRGB(40, 100, 200)
+ToggleButton.Text = "📍"
+ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleButton.TextSize = 14
+ToggleButton.Font = Enum.Font.GothamBold
+ToggleButton.Active = true
+ToggleButton.Draggable = true
+ToggleButton.Parent = ScreenGui
+
+local ToggleCorner = Instance.new("UICorner")
+ToggleCorner.CornerRadius = UDim.new(0, 6)
+ToggleCorner.Parent = ToggleButton
+
+local isVisible = true
+ToggleButton.MouseButton1Click:Connect(function()
+    isVisible = not isVisible
+    Main.Visible = isVisible
+    if isVisible then
+        ToggleButton.Text = "📍"
+        ToggleButton.BackgroundColor3 = Color3.fromRGB(40, 100, 200)
+    else
+        ToggleButton.Text = "🔒"
+        ToggleButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+    end
+end)
+
+-- ==================== プレイヤー選択 ====================
+local PlayerListBtn = Instance.new("TextButton")
+PlayerListBtn.Size = UDim2.new(0.92, 0, 0, 32)
+PlayerListBtn.Position = UDim2.new(0.04, 0, 0, 45)
+PlayerListBtn.BackgroundColor3 = Color3.fromRGB(50, 80, 120)
+PlayerListBtn.Text = "プレイヤーを選択 ▼"
+PlayerListBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+PlayerListBtn.TextSize = 13
+PlayerListBtn.Font = Enum.Font.GothamSemibold
+PlayerListBtn.Parent = Main
+
+local PlayerCorner = Instance.new("UICorner")
+PlayerCorner.CornerRadius = UDim.new(0, 8)
+PlayerCorner.Parent = PlayerListBtn
+
+local PlayerScroll = Instance.new("ScrollingFrame")
+PlayerScroll.Size = UDim2.new(0.92, 0, 0, 95)
+PlayerScroll.Position = UDim2.new(0.04, 0, 0, 82)
+PlayerScroll.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+PlayerScroll.BorderSizePixel = 0
+PlayerScroll.ScrollBarThickness = 4
+PlayerScroll.Visible = false
+PlayerScroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
+PlayerScroll.Parent = Main
+
+local PlayerLayout = Instance.new("UIListLayout")
+PlayerLayout.Padding = UDim.new(0, 4)
+PlayerLayout.SortOrder = Enum.SortOrder.LayoutOrder
+PlayerLayout.Parent = PlayerScroll
+
+local function RefreshPlayerList()
+    for _, child in pairs(PlayerScroll:GetChildren()) do
+        if child:IsA("TextButton") then child:Destroy() end
+    end
+    
+    for _, plr in pairs(game.Players:GetPlayers()) do
+        if plr ~= game.Players.LocalPlayer then
+            local Btn = Instance.new("TextButton")
+            Btn.Size = UDim2.new(1, -8, 0, 28)
+            Btn.BackgroundColor3 = Color3.fromRGB(45, 45, 60)
+            Btn.Text = plr.Name
+            Btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+            Btn.TextSize = 13
+            Btn.Font = Enum.Font.GothamSemibold
+            Btn.Parent = PlayerScroll
+            
+            local c = Instance.new("UICorner")
+            c.CornerRadius = UDim.new(0, 6)
+            c.Parent = Btn
+            
+            Btn.MouseButton1Click:Connect(function()
+                local lp = game.Players.LocalPlayer
+                if lp.Character and lp.Character:FindFirstChild("HumanoidRootPart") and 
+                   plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+                    lp.Character.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame + Vector3.new(0, 3, 0)
+                    print(plr.Name .. " にテレポート")
+                end
+                PlayerScroll.Visible = false
+                PlayerListBtn.Text = "プレイヤーを選択 ▼"
+            end)
+        end
+    end
+end
+
+PlayerListBtn.MouseButton1Click:Connect(function()
+    PlayerScroll.Visible = not PlayerScroll.Visible
+    if PlayerScroll.Visible then
+        RefreshPlayerList()
+        PlayerListBtn.Text = "プレイヤーを選択 ▲"
+    else
+        PlayerListBtn.Text = "プレイヤーを選択 ▼"
+    end
+end)
+
+-- ==================== 保存リスト + 削除機能 ====================
+local SavedPositions = {}
+local ListFrame = Instance.new("ScrollingFrame")
+ListFrame.Size = UDim2.new(0.92, 0, 0, 60)
+ListFrame.Position = UDim2.new(0.04, 0, 0, 190)  -- 下部に配置
+ListFrame.BackgroundTransparency = 1
+ListFrame.BorderSizePixel = 0
+ListFrame.ScrollBarThickness = 4
+ListFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
+ListFrame.Parent = Main
+
+local ListLayout = Instance.new("UIListLayout")
+ListLayout.Padding = UDim.new(0, 6)
+ListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+ListLayout.Parent = ListFrame
+
+-- 現在の位置を保存ボタン
+local SaveBtn = Instance.new("TextButton")
+SaveBtn.Size = UDim2.new(0.92, 0, 0, 32)
+SaveBtn.Position = UDim2.new(0.04, 0, 0, 155)
+SaveBtn.BackgroundColor3 = Color3.fromRGB(45, 120, 60)
+SaveBtn.Text = "現在の位置を保存"
+SaveBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+SaveBtn.TextSize = 13
+SaveBtn.Font = Enum.Font.GothamSemibold
+SaveBtn.Parent = Main
+
+local SaveCorner = Instance.new("UICorner")
+SaveCorner.CornerRadius = UDim.new(0, 8)
+SaveCorner.Parent = SaveBtn
+
+SaveBtn.MouseButton1Click:Connect(function()
+    local player = game.Players.LocalPlayer
+    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        local pos = player.Character.HumanoidRootPart.CFrame
+        local index = #SavedPositions + 1
+        table.insert(SavedPositions, pos)
+
+        -- 保存項目のフレーム（横並びで削除ボタン付き）
+        local ItemFrame = Instance.new("Frame")
+        ItemFrame.Size = UDim2.new(1, 0, 0, 32)
+        ItemFrame.BackgroundTransparency = 1
+        ItemFrame.Parent = ListFrame
+
+        local TPBtn = Instance.new("TextButton")
+        TPBtn.Size = UDim2.new(0.78, 0, 1, 0)
+        TPBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 60)
+        TPBtn.Text = "保存" .. index
+        TPBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        TPBtn.TextSize = 13
+        TPBtn.Font = Enum.Font.GothamSemibold
+        TPBtn.Parent = ItemFrame
+
+        local TPCorner = Instance.new("UICorner")
+        TPCorner.CornerRadius = UDim.new(0, 8)
+        TPCorner.Parent = TPBtn
+
+        -- 削除ボタン
+        local DelBtn = Instance.new("TextButton")
+        DelBtn.Size = UDim2.new(0.2, 0, 1, 0)
+        DelBtn.Position = UDim2.new(0.8, 0, 0, 0)
+        DelBtn.BackgroundColor3 = Color3.fromRGB(180, 50, 50)
+        DelBtn.Text = "×"
+        DelBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        DelBtn.TextSize = 16
+        DelBtn.Font = Enum.Font.GothamBold
+        DelBtn.Parent = ItemFrame
+
+        local DelCorner = Instance.new("UICorner")
+        DelCorner.CornerRadius = UDim.new(0, 8)
+        DelCorner.Parent = DelBtn
+
+        -- テレポート処理
+        TPBtn.MouseButton1Click:Connect(function()
+            if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                player.Character.HumanoidRootPart.CFrame = pos
+            end
+        end)
+
+        -- 削除処理
+        DelBtn.MouseButton1Click:Connect(function()
+            ItemFrame:Destroy()
+            -- SavedPositionsからも削除（簡易的にindex管理は省略）
+            print("保存" .. index .. " を削除しました")
+        end)
+    end
+end)
+
+print("テレポートメニュー起動完了！ 保存した座標は×ボタンで削除できます")
